@@ -11,15 +11,15 @@ This script runs a pipeline to align RNA-seq reads to a genome using STAR.
 Required arguments:
 
 	--workdir STR       path for working directory
-      	--RNA-seq-dir STR   path for directory with RNA-seq files
-       	--ref-genome STR    path for genome fasta file
+	--RNA-seq-dir STR   path for directory with RNA-seq files
+	--ref-genome STR    path for genome fasta file
 
 Optional arguments:
 
 	--runtime HH:MM:SS  runtime for job submissions [12:0:0]
-       	--sj-support INT    minimum support for splice junctions [20]
-       	--debug INT         debug mode to run test data on local number of threads
-       	-h, --help          show this help message and exit
+	--sj-support INT    minimum support for splice junctions [20]
+	--debug INT         debug mode to run test data on local number of threads
+	-h, --help          show this help message and exit
 
 Notes:
    1. This script assumes a standard UNIX/Linux install. In addition, this script
@@ -32,5 +32,6 @@ Notes:
       flags, as those paths may be used in a submission to the cluster.
 
 Test data:
-   1. RNA-seq data is available from https://github.com/griffithlab/rnaseq_tutorial/wiki/RNAseq-Data
-	    at http://genome.wustl.edu/pub/rnaseq/data/practical.tar
+   1. Human RNA-seq data is available from https://github.com/griffithlab/rnaseq_tutorial/wiki/RNAseq-Data 
+   at http://genome.wustl.edu/pub/rnaseq/data/practical.tar.
+   2. The human genome can be downloaded from the 1000 Genome Project at ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/reference/.
