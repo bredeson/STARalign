@@ -34,4 +34,4 @@ Notes:
 Test data:
    1. Human RNA-seq data is available from https://github.com/griffithlab/rnaseq_tutorial/wiki/RNAseq-Data 
    at http://genome.wustl.edu/pub/rnaseq/data/practical.tar.
-   2. The human genome can be downloaded from the 1000 Genome Project at ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/reference/.
+   2. The human genome can be downloaded from the 1000 Genomes Project at ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/reference/.
