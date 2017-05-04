@@ -9,15 +9,17 @@ Usage: STARalign.0_1_1.sh [--workdir STR] [--RNA-seq-dir STR] [--ref-genome STR]
 This script runs a pipeline to align RNA-seq reads to a genome using STAR.
 
 Required arguments:
-       --workdir STR       path for working directory
-       --RNA-seq-dir STR   path for directory with RNA-seq files
-       --ref-genome STR    path for genome fasta file
+
+	--workdir STR       path for working directory
+      	--RNA-seq-dir STR   path for directory with RNA-seq files
+       	--ref-genome STR    path for genome fasta file
 
 Optional arguments:
-       --runtime HH:MM:SS  runtime for job submissions [12:0:0]
-       --sj-support INT    minimum support for splice junctions [20]
-       --debug INT         debug mode to run test data on local number of threads
-       -h, --help          show this help message and exit
+
+	--runtime HH:MM:SS  runtime for job submissions [12:0:0]
+       	--sj-support INT    minimum support for splice junctions [20]
+       	--debug INT         debug mode to run test data on local number of threads
+       	-h, --help          show this help message and exit
 
 Notes:
    1. This script assumes a standard UNIX/Linux install. In addition, this script
