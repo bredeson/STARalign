@@ -1,12 +1,9 @@
-# STARalign
-Pipeline to align RNA-seq reads to a genome using STAR with splice junctions
+STARalign.sh v0.1.1 
 
-STARalign.0_1_1.sh v0.1.1 
-
-Usage: STARalign.0_1_1.sh [--workdir STR] [--RNA-seq-dir STR] [--ref-genome STR]
+Usage: STARalign.sh [--workdir STR] [--RNA-seq-dir STR] [--ref-genome STR]
        [--runtime HH:MM:SS] [--sj-support INT] [--help] [-h]
 
-This script runs a pipeline to align RNA-seq reads to a genome using STAR.
+Pipeline to align RNA-seq reads to a genome using STAR with splice junctions.
 
 Required arguments:
 
