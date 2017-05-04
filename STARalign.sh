@@ -11,12 +11,6 @@ SJSUPPORT='20';
 VERSION='0.1.1'; # Updated 05/03/17 before Jessen
 DATE=`date +%F`;
 COMMAND="$0 $*";
-<<<<<<< HEAD
-DEBUG="0";
-
-# Load modules
-# ============================================================
-=======
 THREADS=0; 
 # Load modules
 # ============================================================
@@ -25,7 +19,7 @@ THREADS=0;
 ##   perspective, your code will be more portable to systems that do not have
 ##   modules if you collect tool paths from the $PATH variable (via `which`)
 ##   at the start of execution.
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
+
 MODULE_STAR="star/2.5.2b";
 MODULE_SAMTOOLS="samtools/0.1.19";
 module rm star;
@@ -48,11 +42,7 @@ function usage () {
     printf "%s v%s \n" `basename $0` $VERSION >&2;
     printf "\n" >&2;
     printf "Usage: %s [--workdir STR] [--RNA-seq-dir STR] [--ref-genome STR]\n" `basename $0` >&2;
-<<<<<<< HEAD
-    printf "       [--runtime HH:MM:SS] [--sj-support INT] [--help] [-h]\n" >&2;
-=======
     printf "       [--runtime HH:MM:SS] [--sj-support INT] [--threads INT] [--help] [-h]\n" >&2;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
     printf "\n" >&2;
     printf "This script runs a pipeline to align RNA-seq reads to a genome using STAR.\n" >&2;
     printf "\n" >&2;
@@ -64,11 +54,7 @@ function usage () {
     printf "Optional arguments:\n" >&2;
     printf "       --runtime HH:MM:SS  runtime for job submissions [12:0:0]\n" >&2;
     printf "       --sj-support INT    minimum support for splice junctions [20]\n" >&2;
-<<<<<<< HEAD
-    printf "       --debug INT         debug mode to run test data on local number of threads\n" >&2;
-=======
     printf "       --threads INT       run pipeline locally with INT number of threads [SGE]\n" >&2;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
     printf "       -h, --help          show this help message and exit\n" >&2;
     printf "\n" >&2;
     printf "Notes:\n" >&2;
@@ -85,11 +71,8 @@ function usage () {
 
 # Check that external tools are accessible
 # ============================================================
-<<<<<<< HEAD
-=======
 CAT=`which cat`;
 ZCAT=`which zcat`;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
 PERL=`which perl`;
 QBATCH=`which qbatch`;
 STAR=`which STAR`;
@@ -98,15 +81,12 @@ SAMTOOLS=`which samtools`;
 if [[ -z "${PERL}" || ! -x "${PERL}" ]]; then
     error 127 "perl not in PATH env variable or not executable";
 
-<<<<<<< HEAD
-=======
 elif [[ -z "${CAT}" || ! -x "${CAT}" ]]; then
     error 127 "cat not in PATH env variable or not executable";
 
 elif [[ -z "${ZCAT}" || ! -x "${ZCAT}" ]]; then
     error 127 "zcat not in PATH env variable or not executable";
 
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
 elif [[ -z "${QBATCH}" || ! -x "${QBATCH}" ]]; then
     error 127 "qbatch not in PATH env variable or not executable";
 
@@ -128,11 +108,7 @@ while [[ -n $@ ]]; do
         '--ref-genome') shift; GENOME=$1;;
         '--runtime') shift; RUNTIME=$1;;
         '--sj-support') shift; SJSUPPORT=$1;;
-<<<<<<< HEAD
-        '--debug') DEBUG=1;;
-=======
         '--threads') THREADS=$1;;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
         '--help') HELP_MESSAGE=1;;
         '-h') HELP_MESSAGE=1;;
         -*) usage; error 2 "Invalid option: ${1}";;
@@ -167,46 +143,6 @@ fi
 
 # Determine fastq format
 # ============================================================
-<<<<<<< HEAD
-if [[ "$(find ${RNADIR}/* -maxdepth 0 -name '*.fastq' | wc -l)" -ne 0 ]]; then
-    FQFORMAT=".fastq";
-
-elif [[ "$(find ${RNADIR}/* -maxdepth 0 -name '*.fq' | wc -l)" -ne 0 ]]; then
-    FQFORMAT=".fq";
-
-elif [[ "$(find ${RNADIR}/* -maxdepth 0 -name '*.fastq.gz' | wc -l)" -ne 0 ]]; then
-    FQFORMAT=".fastq.gz";
-
-elif [[ "$(find ${RNADIR}/* -maxdepth 0 -name '*.fq.gz' | wc -l)" -ne 0 ]]; then
-    FQFORMAT=".fq.gz";
-
-elif [[ -z "${DEBUG}" ]]; then
-    usage; error 1 "DEBUG not defined or does not exist";
-
-else
-    usage; error 1 "Fastq files could not be found in RNADIR";
-fi
-
-# Determine if fastq files are single, pair, or both
-# ============================================================
-if [[ "$(ls ${RNADIR}/*2${FQFORMAT} | wc -l)" -ne 0 && "$(ls ${RNADIR}/*1${FQFORMAT} | wc -l)" == "$(ls ${RNADIR}/*2${FQFORMAT} | wc -l)" ]]; then
-    READEND="pair";
-
-elif [[ "$(ls ${RNADIR}/*2${FQFORMAT} | wc -l)" -eq 0 ]]; then
-    READEND="single";
-
-else
-    READEND="both";
-fi
-
-# Determine max read length - 1
-# ============================================================
-if [[ $FQFORMAT == ".fq.gz" || $FQFORMAT == ".fastq.gz" ]]; then
-    READLEN=`ls $RNADIR/*1$FQFORMAT | while read f; do zcat ${f} | head -n1000; done | awk '{if(NR%4==2) print length($1)}' | $PERL -lane 'use List::Util qw(max min sum); @a=();while(<>){$sqsum+=$_*$_; push(@a,$_)};$m=max(@a);END{printf "%1d\n",($m-1)}'`;
-else
-    READLEN=`ls $RNADIR/*1$FQFORMAT | while read f; do head -n1000 ${f}; done | awk '{if(NR%4==2) print length($1)}' | $PERL -lane 'use List::Util qw(max min sum); @a=();while(<>){$sqsum+=$_*$_; push(@a,$_)};$m=max(@a);END{printf "%1d\n",($m-1)}'`;
-fi
-=======
 # what if the user has files with different suffixes (some .fq and some .fastq files?)
 # You should put in the Usage page that you are assuming only one suffix type
 # and that the user should consistently name their files (and/or compress them).
@@ -277,7 +213,7 @@ fi
 # Determine max read length - 1
 # ============================================================
 READLEN=`for f in $RNADIR/*1$FQFORMAT; do $CATPATH ${f} | head -n1000; done | awk '{if (NR % 4 == 2) { print length($1)}}' | sort -k1,1nr | head -1`;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
+
 
 printf "[%s] PARAM: %s = %s\n" `basename $0` "READLEN"   $READLEN   >&2;
 printf "[%s] PARAM: %s = %s\n" `basename $0` "READEND"   $READEND   >&2;
@@ -303,14 +239,6 @@ printf "[%s] Splitting transcriptome files \n" `basename $0` >&2;
 if [[ -f "${WORKDIR}/Split_Files.submit" && -f "${WORKDIR}/Split_Files.done" ]]; then
     printf "[%s] ... Already done. \n" `basename $0` >&2;
 else
-<<<<<<< HEAD
-    if [[ $FQFORMAT == ".fq.gz" || $FQFORMAT == ".fastq.gz" ]]; then
-	ls $RNADIR/*$FQFORMAT | rev | cut -f1 -d'/' | rev | sed "s/$FQFORMAT//" | while read sample; do echo "zcat $RNADIR/${sample}$FQFORMAT | split -dl 4000000 -a 4 - $WORKDIR/Split_Fastq/${sample}_"; done >$WORKDIR/Split_Files.submit;
-    else
-	ls $RNADIR/*$FQFORMAT | rev | cut -f1 -d'/' | rev | sed "s/$FQFORMAT//" | while read sample; do echo "split -dl 4000000 -a 4 $RNADIR/${sample}$FQFORMAT $WORKDIR/Split_Fastq/${sample}_"; done >$WORKDIR/Split_Files.submit;
-    fi
-    $QBATCH submit -T 10 -n Split_Files.submit $WORKDIR/Split_Files.submit $WORKDIR/BATCH_Split;
-=======
     for f in $RNADIR/*$FQFORMAT; do 
 	sample=`basename $f $FQFORMAT`; 
 	echo "$CATPATH $f | split -dl 4000000 -a 4 - $WORKDIR/Split_Fastq/${sample}_";
@@ -318,7 +246,6 @@ else
     
     $QBATCH submit -T $THREADS -W -n Split_Files.submit $WORKDIR/Split_Files.submit $WORKDIR/BATCH_Split;
 
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
     if [[ "$(grep 'done' ${WORKDIR}/BATCH_Split/Split_Files.submit.e* | wc -l)" == "$(find ${WORKDIR}/BATCH_Split/* -maxdepth 0 -name 'Split_Files.submit.e*' | wc -l)" ]]; then
 	$QBATCH touch $WORKDIR/Split_Files.done;
     else
@@ -334,11 +261,8 @@ if [[ -f "${WORKDIR}/1st_Index.submit" && -f "${WORKDIR}/1st_Index.done" ]]; the
     printf "[%s] ... Already done. \n" `basename $0` >&2;
 else
     echo "cd $WORKDIR && $STAR --runMode genomeGenerate --runThreadN 64 --genomeDir $WORKDIR/Index/1st_Index --genomeFastaFiles $GENOME --limitGenomeGenerateRAM=225000000000" >$WORKDIR/1st_Index.submit;
-<<<<<<< HEAD
-    $QBATCH submit -T $DEBUG -W -R 7 -p 32 -t $RUNTIME -n Index_1st.submit $WORKDIR/1st_Index.submit $WORKDIR/BATCH_1st_Index;
-=======
     $QBATCH submit -T $THREADS -W -R 7 -p 32 -t $RUNTIME -n Index_1st.submit $WORKDIR/1st_Index.submit $WORKDIR/BATCH_1st_Index;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
+
     if [[ "$(grep 'done' ${WORKDIR}/BATCH_1st_Index/1st_Index.submit.e* | wc -l)" == "$(find ${WORKDIR}/BATCH_1st_Index/* -maxdepth 0 -name '1st_Index.submit.e*' | wc -l)" ]]; then
 	$QBATCH touch $WORKDIR/1st_Index.done;
     else
@@ -355,10 +279,6 @@ else
 
     # For paired reads
     # ============================================================
-<<<<<<< HEAD
-    if [[ $READEND == "pair" || $READEND == "both" ]]; then
-	ls $WORKDIR/Split_Fastq/ | grep -v '1_' | rev | cut -f2- -d'_' | cut -c2- | rev | sort | uniq -c | awk {'print $2"\t"$1-1'} | while read sample N; do for n in `seq 0 $N`; do n=`printf %04d $n`; echo "$STAR --genomeDir $WORKDIR/Index/1st_Index --readFilesIn $WORKDIR/Split_Fastq/${sample}1_${n} $WORKDIR/Split_Fastq/${sample}2_${n} --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $WORKDIR/RNA_Mapping/1st_Mapping/${sample}_${n} --runThreadN 32 --chimOutType SeparateSAMold --chimSegmentMin 20 --chimJunctionOverhangMin 20 --outSAMstrandField intronMotif --alignSoftClipAtReferenceEnds No"; done; done >$WORKDIR/1st_Align.submit;
-=======
     # The use of the >> (append) redirection requires us to first
     # make sure to clear any previous .batch files or the commands
     # will be duplicated and clobber eachother when run simultaneously
@@ -377,18 +297,11 @@ else
 		echo "$STAR --genomeDir $WORKDIR/Index/1st_Index --readFilesIn $WORKDIR/Split_Fastq/${sample}1_${n} $WORKDIR/Split_Fastq/${sample}2_${n} --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $WORKDIR/RNA_Mapping/1st_Mapping/${sample}_${n} --runThreadN 32 --chimOutType SeparateSAMold --chimSegmentMin 20 --chimJunctionOverhangMin 20 --outSAMstrandField intronMotif --alignSoftClipAtReferenceEnds No"; 
 	    done; 
 	done >$WORKDIR/1st_Align.submit;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
     fi
 
     # For single reads
     # ============================================================
     if [[ $READEND == "single" || $READEND == "both" ]]; then
-<<<<<<< HEAD
-	ls $WORKDIR/Split_Fastq/ | sed 's/2\_/1_/;' | sort | uniq -u | rev | cut -f2- -d'_' | cut -c2- | rev | sort | uniq -c | awk {'print $2"\t"$1-1'} | while read sample N; do for n in `seq 0 $N`; do n=`printf %04d $n`; echo "$STAR --genomeDir $WORKDIR/Index/1st_Index --readFilesIn $WORKDIR/Split_Fastq/${sample}1_${n} --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $WORKDIR/RNA_Mapping/1st_Mapping/${sample}_${n} --runThreadN 32 --chimOutType SeparateSAMold --chimSegmentMin 20 --chimJunctionOverhangMin 20 --outSAMstrandField intronMotif --alignSoftClipAtReferenceEnds No"; done; done >>$WORKDIR/1st_Align.submit;
-    fi
-
-    $QBATCH submit -T $DEBUG -W -t $RUNTIME -p 16 -R 5 -S 4 -n Align_1.submit $WORKDIR/1st_Align.submit $WORKDIR/BATCH_1st_Align;
-=======
 	# Are we expecting single files to have the same naming convetion as paired?
 	ls $WORKDIR/Split_Fastq/*0_[0-9][0-9][0-9][0-9] | rev | cut -c7- | rev | sort | uniq -c | awk '{print $2"\t"$1-1}' | \
         while read sample N; do 
@@ -400,7 +313,7 @@ else
     fi
 
     $QBATCH submit -T $THREADS -W -t $RUNTIME -p 16 -R 5 -S 4 -n Align_1.submit $WORKDIR/1st_Align.submit $WORKDIR/BATCH_1st_Align;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
+
     if [[ "$(grep -o 'done' ${WORKDIR}/BATCH_1st_Align/1st_Align.submit.e* | wc -l)" == "$(find ${WORKDIR}/Split_Fastq/* -maxdepth 0 -name '*1_*' | wc -l)" ]]; then
 	$QBATCH touch $WORKDIR/1st_Align.done;
     else
@@ -435,11 +348,9 @@ if [[ -f "${WORKDIR}/2nd_Index.submit" && -f "${WORKDIR}/2nd_Index.done" ]]; the
     printf "[%s] ... Already done. \n" `basename $0` >&2;
 else
     echo "cd $WORKDIR && $STAR --runMode genomeGenerate --runThreadN 64 --genomeDir $WORKDIR/Index/2nd_Index --genomeFastaFiles $GENOME --sjdbFileChrStartEnd $WORKDIR/sjdb.out --limitGenomeGenerateRAM=225000000000 --sjdbOverhang $READLEN" >$WORKDIR/2nd_Index.submit;
-<<<<<<< HEAD
-    $QBATCH submit -T $DEBUG -W -R 7 -p 32 -t $RUNTIME -n Index_2nd.submit $WORKDIR/2nd_Index.submit $WORKDIR/BATCH_2nd_Index;
-=======
+
     $QBATCH submit -T $THREADS -W -R 7 -p 32 -t $RUNTIME -n Index_2nd.submit $WORKDIR/2nd_Index.submit $WORKDIR/BATCH_2nd_Index;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
+
     if [[ "$(grep 'done' ${WORKDIR}/BATCH_2nd_Index/2nd_Index.submit.e* | wc -l)" != "$(find ${WORKDIR}/BATCH_2nd_Index/* -maxdepth 0 -name '2nd_Index.submit.e*' | wc -l)" ]]; then
 	error 1 "Indexing genome failed; please identify error and restart";
     else
@@ -456,10 +367,6 @@ else
 
     # For paired reads
     # ============================================================
-<<<<<<< HEAD
-    if [[ $READEND == "pair" || $READEND == "both" ]]; then
-	ls $WORKDIR/Split_Fastq/ | grep -v '1_' | rev | cut -f2- -d'_' | cut -c2- | rev | sort | uniq -c | awk {'print $2"\t"$1-1'} | while read sample N; do for n in `seq 0 $N`; do n=`printf %04d $n`; echo "$STAR --genomeDir $WORKDIR/Index/2nd_Index --readFilesIn $WORKDIR/Split_Fastq/${sample}1_${n} $WORKDIR/Split_Fastq/${sample}2_${n} --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $WORKDIR/RNA_Mapping/2nd_Mapping/${sample}_${n} --runThreadN 32 --chimOutType SeparateSAMold --chimSegmentMin 20 --sjdbFileChrStartEnd $WORKDIR/sjdb.out --chimJunctionOverhangMin 20 --outSAMstrandField intronMotif --alignSoftClipAtReferenceEnds No"; done; done >$WORKDIR/2nd_Align.submit;
-=======
     printf '' >2nd_Align.submit;
     if [[ $READEND == "pair" || $READEND == "both" ]]; then
 	# using grep -v 1_ is problematic...
@@ -470,18 +377,11 @@ else
 		echo "$STAR --genomeDir $WORKDIR/Index/2nd_Index --readFilesIn $WORKDIR/Split_Fastq/${sample}1_${n} $WORKDIR/Split_Fastq/${sample}2_${n} --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $WORKDIR/RNA_Mapping/2nd_Mapping/${sample}_${n} --runThreadN 32 --chimOutType SeparateSAMold --chimSegmentMin 20 --sjdbFileChrStartEnd $WORKDIR/sjdb.out --chimJunctionOverhangMin 20 --outSAMstrandField intronMotif --alignSoftClipAtReferenceEnds No"; 
 	    done; 
 	done >$WORKDIR/2nd_Align.submit;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
     fi
 
     # For single reads
     # ============================================================
     if [[ $READEND == "single" || $READEND == "both" ]]; then
-<<<<<<< HEAD
-	ls $WORKDIR/Split_Fastq/ | sed 's/2\_/1_/;' | sort | uniq -u | rev | cut -f2- -d'_' | cut -c2- | rev | sort | uniq -c | awk {'print $2"\t"$1-1'} | while read sample N; do for n in `seq 0 $N`; do n=`printf %04d $n`; echo "$STAR --genomeDir $WORKDIR/Index/2nd_Index --readFilesIn $WORKDIR/Split_Fastq/${sample}1_${n} --outSAMtype BAM SortedByCoordinate --outFileNamePrefix $WORKDIR/RNA_Mapping/2nd_Mapping/${sample}_${n} --runThreadN 32 --chimOutType SeparateSAMold --chimSegmentMin 20 --sjdbFileChrStartEnd $WORKDIR/sjdb.out --chimJunctionOverhangMin 20 --outSAMstrandField intronMotif --alignSoftClipAtReferenceEnds No"; done; done >>$WORKDIR/2nd_Align.submit;
-    fi
-
-    $QBATCH submit -T $DEBUG -W -t $RUNTIME -p 16 -R 5 -S 4 -n Align_2.submit $WORKDIR/2nd_Align.submit $WORKDIR/BATCH_2nd_Align;
-=======
 	ls $WORKDIR/Split_Fastq/*0_[0-9][0-9][0-9][0-9] | rev | cut -c7- | rev | sort | uniq -c | awk '{print $2"\t"$1-1}' | \
 	while read sample N; do 
 	    for n in `seq 0 $N`; do 
@@ -492,7 +392,7 @@ else
     fi
 
     $QBATCH submit -T $THREADS -W -t $RUNTIME -p 16 -R 5 -S 4 -n Align_2.submit $WORKDIR/2nd_Align.submit $WORKDIR/BATCH_2nd_Align;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
+
     if [[ "$(grep -o 'done' ${WORKDIR}/BATCH_2nd_Align/2nd_Align.submit.e* | wc -l)" == "$(find ${WORKDIR}/Split_Fastq/* -maxdepth 0 -name '*1_*' | wc -l)" ]]; then
 	$QBATCH touch $WORKDIR/2nd_Align.done;
     else
@@ -509,14 +409,10 @@ fi
 # ============================================================  
 printf "[%s] Merging final bam files \n" `basename $0` >&2;
 if [[ "$(find ${WORKDIR}/Final_Bam/* -maxdepth 0 -name '*bam' -size +1c | wc -l)" != "$(find ${RNADIR}/* -maxdepth 0 -name '*1${FQFORMAT}' | wc -l)" ]]; then
-<<<<<<< HEAD
-    ls $WORKDIR/Split_Fastq/ | sed 's/2\_/1_/;' | sort | uniq | rev | cut -f2- -d'_' | cut -c2- | rev | sort | uniq | sed 's/\.$//' | while read sample; do $SAMTOOLS merge -f -@ 10 $WORKDIR/Final_Bam/${sample}.bam $WORKDIR/RNA_Mapping/2nd_Mapping/${sample}*Aligned.sortedByCoord.out.bam; done;
-=======
     ls $WORKDIR/Split_Fastq/*[012]_[0-9][0-9][0-9][0-9] | rev | cut -c8- | rev | sort | uniq -c | awk '{print $2"\t"$1-1}' | \
     while read sample; do 
 	$SAMTOOLS merge -f -@ 10 $WORKDIR/Final_Bam/${sample}.bam $WORKDIR/RNA_Mapping/2nd_Mapping/${sample}*Aligned.sortedByCoord.out.bam; 
     done;
->>>>>>> 740b804b430fd6b0dcd4af42b75e721e704632eb
 else
     error 1 "Merging final bam files failed; please identify error and restart";
 fi
